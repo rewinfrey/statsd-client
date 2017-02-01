@@ -42,14 +42,14 @@ decrement client stat = count client stat (-1)
 count :: UdpClient -> Stat -> Int -> IO ()
 count client stat value = void . send client $ fmtDatagram stat value Count
 
-gauge :: UdpClient -> Stat -> Int -> IO ()
+gauge :: (Show a, Num a) => UdpClient -> Stat -> a -> IO ()
 gauge client stat value = void . send client $ fmtDatagram stat value Gauge
 
 timing :: UdpClient -> Stat -> Millisecond -> IO ()
 timing client stat value = void . send client $ fmtDatagram stat (fromIntegral value) Timing
 
-histogram :: UdpClient -> Stat -> Int -> IO ()
+histogram :: (Show a, Num a) => UdpClient -> Stat -> a -> IO ()
 histogram client stat value = void . send client $ fmtDatagram stat value Histogram
 
-fmtDatagram :: Stat -> Int -> Type -> String
+fmtDatagram:: (Show a, Num a) => Stat -> a -> Type -> String
 fmtDatagram stat value statType = printf "%s:%s|%s" stat (show value) (show statType)
