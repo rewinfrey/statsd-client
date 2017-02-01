@@ -34,20 +34,20 @@ decrement client stat = count client stat (-1)
 count :: UdpClient -> Stat -> Int -> Tags -> IO ()
 count client stat value tags = void . send client $ fmtDogStatsdDatagram stat value Count tags
 
-gauge :: UdpClient -> Stat -> Int -> Tags -> IO ()
+gauge :: (Show a, Num a) => UdpClient -> Stat -> a -> Tags -> IO ()
 gauge client stat value tags = void . send client $ fmtDogStatsdDatagram stat value Gauge tags
 
 timing :: UdpClient -> Stat -> Millisecond -> Tags -> IO ()
 timing client stat value tags = void . send client $ fmtDogStatsdDatagram stat (fromIntegral value) Timing tags
 
-histogram :: UdpClient -> Stat -> Int -> Tags -> IO ()
+histogram :: (Show a, Num a) => UdpClient -> Stat -> a -> Tags -> IO ()
 histogram client stat value tags = void . send client $ fmtDogStatsdDatagram stat value Histogram tags
 
 fmtTag :: (Name, Value) -> String
 fmtTag (a, "") = a
 fmtTag (a, b) = a ++ ":" ++ b
 
-fmtDogStatsdDatagram :: Stat -> Int -> Type -> Tags -> String
+fmtDogStatsdDatagram :: (Show a, Num a) => Stat -> a -> Type -> Tags -> String
 fmtDogStatsdDatagram stat value statType [] = fmtDatagram stat value statType
 fmtDogStatsdDatagram stat value statType tags =
   let statsdDatagram = fmtDatagram stat value statType
